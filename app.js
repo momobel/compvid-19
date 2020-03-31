@@ -1,13 +1,13 @@
 Vue.component('graph-inst', {
   props: [
     'divid',
-    'title',
+    'stat',
     'threshold',
     'plotData',
   ],
   data: function() {
     return {
-      divid: null, threshold: 0, title: '', plotData: null
+      divid: null, threshold: 0, stat: '', plotData: null
     }
   },
   template: '<div v-bind:id="divid"></div>',
@@ -40,7 +40,11 @@ Vue.component('graph-inst', {
   },
   watch: {
     plotData: function(val, oldVal) {
-      var layout = {title: this.title, yaxis: {type: 'log'}};
+      var layout = {
+        title: this.stat + ' since ' + this.threshold + ' reached',
+        xaxis: {title: 'Days since ' + this.threshold + ' ' + this.stat},
+        yaxis: {title: this.stat, type: 'log'}
+      };
       var data = this.getDataFromThreshold(val);
       Plotly.react(document.getElementById(this.divid), data, layout);
     }
