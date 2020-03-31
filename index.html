@@ -25,8 +25,9 @@
             </b-collapse>
         </b-navbar>
         </b-navbar>
+
         <b-container fluid>
-            <b-row>
+            <b-row cols=auto>
                 <b-col cols=1>
                     <div id="country-list">
                         <ul>
@@ -37,9 +38,7 @@
                     </div>
                 </b-col>
                 <b-col>
-                    <div id="graph">
-
-                    </div>
+                    <graph-inst divid="graph-cases" v-bind:plot-data="graphData"></graph-inst>
                 </b-col>
             </b-row>
         </b-container>
