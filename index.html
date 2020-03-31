@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>compvid-19: COVID-19 situation comparator</title>
+
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div id="countries">
+            <ul>
+                <li v-for="country in countries">
+                    {{ country }}
+                </li>
+            </ul>
+        </div>
+        <div id="graph">
+
+        </div>
+        <div id="graphs">
+
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
