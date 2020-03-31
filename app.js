@@ -65,8 +65,12 @@ var app = new Vue({
   },
   methods: {
     parseData: function(json) {
+      this.countries = json.filter(entry => entry['province'] == null)
+                           .map(entry => entry['country'])
+                           .sort()
       var history = json.filter(
-          entry => entry.province == null && desired.includes(entry.country));
+          entry =>
+              entry['province'] == null && desired.includes(entry['country']))
       var data = {cases: [], deaths: [], recovered: []};
       for (country_data of history) {
         for (stat of ['cases', 'deaths', 'recovered']) {
