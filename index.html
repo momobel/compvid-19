@@ -41,17 +41,21 @@
                     <b-container>
                         <b-row>
                             <b-col>
-                                <graph-inst divid="graph-cases" v-bind:plot-data="graphData.cases"></graph-inst>
+                                <graph-inst threshold=50 title="Confirmed cases" divid="graph-cases"
+                                    v-bind:plot-data="graphData.cases"></graph-inst>
                             </b-col>
                         </b-row>
                         <b-row>
                             <b-col>
-                                <graph-inst divid="graph-deaths" v-bind:plot-data="graphData.deaths"></graph-inst>
+                                <graph-inst threshold=5 title="Deaths" divid="graph-deaths"
+                                    v-bind:plot-data="graphData.deaths">
+                                </graph-inst>
                             </b-col>
                         </b-row>
                         <b-row>
                             <b-col>
-                                <graph-inst divid="graph-recovered" v-bind:plot-data="graphData.recovered"></graph-inst>
+                                <graph-inst threshold=50 title="Recovered" divid="graph-recovered"
+                                    v-bind:plot-data="graphData.recovered"></graph-inst>
                             </b-col>
                         </b-row>
                     </b-container>

@@ -1,27 +1,53 @@
 Vue.component('graph-inst', {
-  props: ['divid', 'plotData'],
+  props: [
+    'divid',
+    'title',
+    'threshold',
+    'plotData',
+  ],
   data: function() {
     return {
-      divid: null, plotData: null
+      divid: null, threshold: 0, title: '', plotData: null
     }
   },
   template: '<div v-bind:id="divid"></div>',
   mounted: function() {
     Plotly.newPlot(document.getElementById(this.divid, []))
   },
+  methods: {
+    getDataFromThreshold: function(d) {
+      var data = [];
+      for (const country in d) {
+        var x = [];
+        var y = [];
+        var i = 0;
+        var start = false;
+        for (const day in d[country]) {
+          var cases = d[country][day];
+          if (!start && cases > this.threshold) {
+            start = true;
+          }
+          if (start) {
+            x.push(i);
+            y.push(cases);
+            i++;
+          }
+        }
+        data.push({name: country, x: x, y: y});
+      }
+      return data;
+    }
+  },
   watch: {
     plotData: function(val, oldVal) {
-      console.log('new ' + val);
-      if (val == null) {
-        return;
-      }
-      var layout = {yaxis: {type: 'log'}};
-      Plotly.react(document.getElementById(this.divid), val, layout);
+      var layout = {title: this.title, yaxis: {type: 'log'}};
+      var data = this.getDataFromThreshold(val);
+      Plotly.react(document.getElementById(this.divid), data, layout);
     }
   }
 })
 
-desired =
+const desired =
     ['France', 'USA', 'Germany', 'Italy', 'Spain', 'UK', 'Japan', 'S. Korea'];
 
 var app = new Vue({
@@ -35,27 +61,12 @@ var app = new Vue({
   },
   methods: {
     parseData: function(json) {
-      var countries_hist = json.filter(
+      var history = json.filter(
           entry => entry.province == null && desired.includes(entry.country));
       var data = {cases: [], deaths: [], recovered: []};
-      for (country_data of countries_hist) {
+      for (country_data of history) {
         for (stat of ['cases', 'deaths', 'recovered']) {
-          var x = [];
-          var y = [];
-          var i = 0;
-          var start = false;
-          Object.keys(country_data.timeline[stat]).forEach(function(day) {
-            var ccases = country_data.timeline[stat][day];
-            if (!start && ccases > 50) {
-              start = true;
-            }
-            if (start) {
-              x.push(i);
-              y.push(ccases);
-              i = i + 1;
-            }
-          })
-          data[stat].push({name: country_data.country, x: x, y: y})
+          data[stat][country_data['country']] = country_data['timeline'][stat]
         }
       }
       this.graphData = data;
