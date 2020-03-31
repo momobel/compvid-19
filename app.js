@@ -26,7 +26,10 @@ desired =
 
 var app = new Vue({
   el: '#app',
-  data: {countries: desired, graphData: null},
+  data: {
+    countries: desired,
+    graphData: {cases: null, deaths: null, recovered: null}
+  },
   mounted: function() {
     Plotly.d3.json('https://corona.lmao.ninja/v2/historical', this.parseData);
   },
@@ -34,26 +37,27 @@ var app = new Vue({
     parseData: function(json) {
       var countries_hist = json.filter(
           entry => entry.province == null && desired.includes(entry.country));
-      var data = [];
+      var data = {cases: [], deaths: [], recovered: []};
       for (country_data of countries_hist) {
-        var x = [];
-        var y = [];
-        var i = 0;
-        var start = false;
-        Object.keys(country_data.timeline.cases).forEach(function(day) {
-          var ccases = country_data.timeline.cases[day];
-          if (!start && ccases > 50) {
-            start = true;
-          }
-          if (start) {
-            x.push(i);
-            y.push(ccases);
-            i = i + 1;
-          }
-        })
-        data.push({name: country_data.country, x: x, y: y})
+        for (stat of ['cases', 'deaths', 'recovered']) {
+          var x = [];
+          var y = [];
+          var i = 0;
+          var start = false;
+          Object.keys(country_data.timeline[stat]).forEach(function(day) {
+            var ccases = country_data.timeline[stat][day];
+            if (!start && ccases > 50) {
+              start = true;
+            }
+            if (start) {
+              x.push(i);
+              y.push(ccases);
+              i = i + 1;
+            }
+          })
+          data[stat].push({name: country_data.country, x: x, y: y})
+        }
       }
-      var layout = {yaxis: {type: 'log'}};
       this.graphData = data;
     }
   }

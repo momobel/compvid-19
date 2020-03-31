@@ -38,7 +38,23 @@
                     </div>
                 </b-col>
                 <b-col>
-                    <graph-inst divid="graph-cases" v-bind:plot-data="graphData"></graph-inst>
+                    <b-container>
+                        <b-row>
+                            <b-col>
+                                <graph-inst divid="graph-cases" v-bind:plot-data="graphData.cases"></graph-inst>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col>
+                                <graph-inst divid="graph-deaths" v-bind:plot-data="graphData.deaths"></graph-inst>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col>
+                                <graph-inst divid="graph-recovered" v-bind:plot-data="graphData.recovered"></graph-inst>
+                            </b-col>
+                        </b-row>
+                    </b-container>
                 </b-col>
             </b-row>
         </b-container>
