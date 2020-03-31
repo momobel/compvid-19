@@ -1,31 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
-    <title>compvid-19: COVID-19 situation comparator</title>
-
+    <!-- Required meta tags -->
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
     <link rel="stylesheet" type="text/css" href="style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <title>compvid-19: COVID-19 situation comparator</title>
 </head>
 
 <body>
     <div id="app">
-        <div id="countries">
-            <ul>
-                <li v-for="country in countries">
-                    {{ country }}
-                </li>
-            </ul>
-        </div>
-        <div id="graph">
+        <b-navbar variant="dark" type="dark">
+            <b-navbar-brand>compvid-19</b-navbar-brand>
+            <b-collapse is-nav>
+                <b-navbar-nav>
+                    <b-nav-text>the COVID-19 comparator</b-nav-text>
+                </b-navbar-nav>
+            </b-collapse>
+        </b-navbar>
+        </b-navbar>
+        <b-container fluid>
+            <b-row>
+                <b-col cols=1>
+                    <div id="country-list">
+                        <ul>
+                            <li v-for="country in countries">
+                                {{ country }}
+                            </li>
+                        </ul>
+                    </div>
+                </b-col>
+                <b-col>
+                    <div id="graph">
 
-        </div>
-        <div id="graphs">
-
-        </div>
+                    </div>
+                </b-col>
+            </b-row>
+        </b-container>
     </div>
+
+    <!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
+    <script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="app.js"></script>
 </body>
 
