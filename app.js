@@ -69,6 +69,7 @@ var app = new Vue({
   data: {
     countries: [],
     selectedCountries: [],
+    searchedCountry: '',
     graphData: {cases: null, deaths: null, recovered: null}
   },
   created: function() {
@@ -82,6 +83,21 @@ var app = new Vue({
   watch: {
     selectedCountries: function(val, oldVal) {
       this.updateProcessedData()
+    },
+    searchedCountry: function(val, oldVal) {
+      if (!val) {
+        return
+      }
+      if (this.countries.includes(val)) {
+        var idx = this.selectedCountries.indexOf(val)
+        if (idx == -1) {
+          this.selectedCountries.push(val)
+        }
+        else {
+          this.selectedCountries.splice(idx, 1)
+        }
+        this.searchedCountry = ''
+      }
     }
   },
   methods: {
