@@ -6,6 +6,14 @@ Vue.component('graph-inst', {
     log: {type: Boolean, default: true},
     plotData: Object,
   },
+  computed: {
+    title: function() {
+      return this.stat + ' since ' + this.threshold + ' reached'
+    },
+    xaxisTitle: function() {
+      return 'Days since ' + this.threshold + ' ' + this.stat
+    }
+  },
   data: function() {
     return {
       divid: null, stat: '', threshold: 0, log: true, plotData: null
@@ -43,8 +51,7 @@ Vue.component('graph-inst', {
     },
     buildLayout: function() {
       return {
-        title: this.stat + ' since ' + this.threshold + ' reached',
-            xaxis: {title: 'Days since ' + this.threshold + ' ' + this.stat},
+        title: this.title, xaxis: {title: this.xaxisTitle},
             yaxis: {title: this.stat, type: this.log ? 'log' : 'linear'}
       }
     }
