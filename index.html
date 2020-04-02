@@ -65,6 +65,20 @@
                         </b-row>
                     </b-container>
                 </b-col>
+                <b-col cols=2>
+                    <b-form-group label="Data selection" label-for="data-select"></b-form-group>
+                    <b-form-select id="data-select" v-model="dataSelectType" :options="dataSelectOptions">
+                    </b-form-select>
+
+                    <!-- Selection from threshold -->
+                    <div v-if="dataSelectType == 'thresholdReached'">
+                        <b-form-input type="number" v-model="threshold"></b-form-input>
+                        <b-form-select v-model="thresholdStat" :options="thresholdStatOptions"></b-form-select>
+                    </div>
+
+                    <!-- Selection from data -->
+                    <b-form-input v-if="dataSelectType == 'sinceDate'" type='date' v-model="since"></b-form-input>
+                </b-col>
             </b-row>
         </b-container>
     </div>
