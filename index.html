@@ -30,7 +30,8 @@
             <b-row cols=auto>
                 <b-col cols=2>
                     <div id="country-filter">
-                        <b-form-input placeholder="Search country..." list="country-list" v-model="searchedCountry">
+                        <b-form-input placeholder="Search country..." autofocus list="country-list"
+                            v-model="searchedCountry">
                         </b-form-input>
                         <b-form-datalist id="country-list" :options="countries">
                         </b-form-datalist>
