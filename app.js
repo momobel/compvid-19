@@ -23,9 +23,7 @@ Vue.component('graph-inst', {
                <b-form-checkbox v-model="log" switch>logarithmic scale</b-form-checkbox>
                <div v-bind:id="divid"></div>
              </div>`,
-  mounted: function() {
-    Plotly.newPlot(document.getElementById(this.divid, []))
-  },
+  mounted: function() {},
   methods: {
     getDataFromThreshold: function(d) {
       var data = [];
