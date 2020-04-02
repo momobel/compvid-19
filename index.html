@@ -30,11 +30,11 @@
             <b-row cols=auto>
                 <b-col cols=1>
                     <div id="country-list">
-                        <ul>
-                            <li v-for="country in countries">
-                                {{ country }}
-                            </li>
-                        </ul>
+                        <b-form-group label="Countries">
+                            <b-form-checkbox-group id="countries-checkbox" v-model="selectedCountries"
+                                :options="countries" stacked>
+                            </b-form-checkbox-group>
+                        </b-form-group>
                     </div>
                 </b-col>
                 <b-col>

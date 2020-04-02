@@ -57,27 +57,42 @@ const desired =
 var app = new Vue({
   el: '#app',
   data: {
-    countries: desired,
+    countries: [],
+    selectedCountries: [],
     graphData: {cases: null, deaths: null, recovered: null}
   },
-  mounted: function() {
+  created: function() {
+    this._jsonData = null
     Plotly.d3.json('https://corona.lmao.ninja/v2/historical', this.parseData);
   },
+  mounted: function() {
+    // Plotly.d3.json('https://corona.lmao.ninja/v2/historical',
+    // this.parseData);
+  },
+  watch: {
+    selectedCountries: function(val, oldVal) {
+      this.updateProcessedData()
+    }
+  },
   methods: {
-    parseData: function(json) {
-      this.countries = json.filter(entry => entry['province'] == null)
-                           .map(entry => entry['country'])
-                           .sort()
-      var history = json.filter(
-          entry =>
-              entry['province'] == null && desired.includes(entry['country']))
+    updateProcessedData: function() {
       var data = {cases: [], deaths: [], recovered: []};
-      for (country_data of history) {
-        for (stat of ['cases', 'deaths', 'recovered']) {
-          data[stat][country_data['country']] = country_data['timeline'][stat]
+      for (country_data of this._jsonData) {
+        if (this.selectedCountries.includes(country_data['country'])) {
+          for (stat of ['cases', 'deaths', 'recovered']) {
+            data[stat][country_data['country']] =
+                country_data['timeline'][stat];
+          }
         }
       }
       this.graphData = data;
+    },
+    parseData: function(json) {
+      this.countries = json.filter(entry => entry['province'] == null)
+                           .map(entry => entry['country'])
+                           .sort();
+      this._jsonData = json;
+      this.updateProcessedData();
     }
   }
 })
