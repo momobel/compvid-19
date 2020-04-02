@@ -1,16 +1,20 @@
 Vue.component('graph-inst', {
-  props: [
-    'divid',
-    'stat',
-    'threshold',
-    'plotData',
-  ],
+  props: {
+    divid: String,
+    stat: String,
+    threshold: Number,
+    log: {type: Boolean, default: true},
+    plotData: Object,
+  },
   data: function() {
     return {
-      divid: null, threshold: 0, stat: '', plotData: null
+      divid: null, stat: '', threshold: 0, log: true, plotData: null
     }
   },
-  template: '<div v-bind:id="divid"></div>',
+  template: `<div>
+               <b-form-checkbox v-model="log" switch>logarithmic scale</b-form-checkbox>
+               <div v-bind:id="divid"></div>
+             </div>`,
   mounted: function() {
     Plotly.newPlot(document.getElementById(this.divid, []))
   },
@@ -36,17 +40,23 @@ Vue.component('graph-inst', {
         data.push({name: country, x: x, y: y});
       }
       return data;
+    },
+    buildLayout: function() {
+      return {
+        title: this.stat + ' since ' + this.threshold + ' reached',
+            xaxis: {title: 'Days since ' + this.threshold + ' ' + this.stat},
+            yaxis: {title: this.stat, type: this.log ? 'log' : 'linear'}
+      }
     }
   },
   watch: {
     plotData: function(val, oldVal) {
-      var layout = {
-        title: this.stat + ' since ' + this.threshold + ' reached',
-        xaxis: {title: 'Days since ' + this.threshold + ' ' + this.stat},
-        yaxis: {title: this.stat, type: 'log'}
-      };
-      var data = this.getDataFromThreshold(val);
-      Plotly.react(document.getElementById(this.divid), data, layout);
+      Plotly.react(
+          document.getElementById(this.divid), this.getDataFromThreshold(val),
+          this.buildLayout())
+    },
+    log: function(val, oldVal) {
+      Plotly.relayout(document.getElementById(this.divid), this.buildLayout())
     }
   }
 })
