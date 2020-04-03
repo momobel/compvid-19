@@ -91,7 +91,7 @@ var app = new Vue({
     }
   },
   created: function() {
-    this._jsonData = null
+    this._dataByCountry = null
     Plotly.d3.json('https://corona.lmao.ninja/v2/historical', this.parseData);
   },
   mounted: function() {},
@@ -157,49 +157,58 @@ var app = new Vue({
     },
     updateGraphData: function() {
       var data = {cases: [], deaths: [], recovered: []};
-      for (country_data of this._jsonData) {
-        if (this.selectedCountries.includes(country_data['country'])) {
-          let startDate = null
-          let xSelector = null
-          if (this.dataSelectType == dsSinceDate) {
-            startDate = this.sinceDate;
-            xSelector = function(d) {
-              return d.date;
+      for (const country of this.selectedCountries) {
+        const country_data = this._dataByCountry.get(country);
+        if (country_data == undefined) {
+          continue;
+        }
+        let startDate = null
+        let xSelector = null
+        if (this.dataSelectType == dsSinceDate) {
+          startDate = this.sinceDate;
+          xSelector = function(d) {
+            return d.date;
+          }
+        }
+        else if (this.dataSelectType == dsThresholdReached) {
+          startDate = this.findThresholdReachedDate(
+              country_data[this.thresholdStat], this.threshold);
+          xSelector = function(d) {
+            return d.idx;
+          }
+        }
+        else {
+          console.log(
+              'Data select type "' + this.dataSelectType + '" not supported')
+        }
+        if (startDate == null || xSelector == null) {
+          continue
+        }
+        for (stat of ['cases', 'deaths', 'recovered']) {
+          const selectedData =
+              this.selectDataSinceDate(country_data[stat], startDate)
+          const graphDataSince = selectedData.map(function(d) {
+            return {
+              x: xSelector(d), y: d.val
             }
-          }
-          else if (this.dataSelectType == dsThresholdReached) {
-            startDate = this.findThresholdReachedDate(
-                country_data['timeline'][this.thresholdStat], this.threshold);
-            xSelector = function(d) {
-              return d.idx;
-            }
-          }
-          else {
-            console.log(
-                'Data select type "' + this.dataSelectType + '" not supported')
-          }
-          if (startDate == null || xSelector == null) {
-            continue
-          }
-          for (stat of ['cases', 'deaths', 'recovered']) {
-            const selectedData = this.selectDataSinceDate(
-                country_data['timeline'][stat], startDate)
-            const graphDataSince = selectedData.map(function(d) {
-              return {
-                x: xSelector(d), y: d.val
-              }
-            });
-            data[stat][country_data['country']] = graphDataSince
-          }
+          });
+          data[stat][country] = graphDataSince
         }
       }
       this.graphData = data;
     },
     parseData: function(json) {
-      this.countries = json.filter(entry => entry['province'] == null)
-                           .map(entry => entry['country'])
-                           .sort();
-      this._jsonData = json;
+      let countries = [];
+      let dataByCountry = new Map();
+      for (const cinfo of json) {
+        if (cinfo['province'] == null) {
+          const country = cinfo['country'];
+          countries.push(country);
+          dataByCountry.set(country, cinfo['timeline']);
+        }
+      }
+      this.countries = countries.sort();
+      this._dataByCountry = dataByCountry;
       this.updateGraphData();
     }
   }
