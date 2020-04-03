@@ -3,7 +3,7 @@ Vue.component('graph-inst', {
     divid: String,
     stat: String,
     xaxisTitle: {type: String, default: ''},
-    log: {type: Boolean, default: true},
+    log: {type: Boolean, default: false},
     plotData: Object,
   },
   computed: {
