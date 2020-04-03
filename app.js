@@ -25,25 +25,16 @@ Vue.component('graph-inst', {
              </div>`,
   mounted: function() {},
   methods: {
-    getDataFromThreshold: function(d) {
+    buildPlotData: function(d) {
       var data = [];
-      for (const country in d) {
-        var x = [];
-        var y = [];
-        var i = 0;
-        var start = false;
-        for (const day in d[country]) {
-          var cases = d[country][day];
-          if (!start && cases > this.threshold) {
-            start = true;
-          }
-          if (start) {
-            x.push(i);
-            y.push(cases);
-            i++;
-          }
+      for (const name in d) {
+        let x = [];
+        let y = [];
+        for (const point of d[name]) {
+          x.push(point.x)
+          y.push(point.y)
         }
-        data.push({name: country, x: x, y: y});
+        data.push({name: name, x: x, y: y});
       }
       return data;
     },
@@ -57,7 +48,7 @@ Vue.component('graph-inst', {
   watch: {
     plotData: function(val, oldVal) {
       Plotly.react(
-          document.getElementById(this.divid), this.getDataFromThreshold(val),
+          document.getElementById(this.divid), this.buildPlotData(val),
           this.buildLayout())
     },
     log: function(val, oldVal) {
@@ -66,8 +57,8 @@ Vue.component('graph-inst', {
   }
 })
 
-const desired =
-    ['France', 'USA', 'Germany', 'Italy', 'Spain', 'UK', 'Japan', 'S. Korea'];
+const dsThresholdReached = 'thresholdReached'
+const dsSinceDate = 'sinceDate'
 
 var app = new Vue({
   el: '#app',
@@ -75,19 +66,39 @@ var app = new Vue({
     countries: [],
     selectedCountries: [],
     searchedCountry: '',
+    dataSelectType: dsSinceDate,
+    dataSelectOptions: [
+      {value: dsThresholdReached, text: 'From threshold reached'},
+      {value: dsSinceDate, text: 'Since date'}
+    ],
+    thresholdStat: 'cases',
+    thresholdStatOptions: [
+      {value: 'cases', text: 'Confirmed cases'},
+      {value: 'deaths', text: 'Deaths'},
+      {value: 'recovered', text: 'Recovered'}
+    ],
+    threshold: 50,
+    since: '2020-22-1',
     graphData: {cases: null, deaths: null, recovered: null}
+  },
+  computed: {
+    sinceDate: function() {
+      var tokens = this.since.split('-')
+      if (tokens.length != 3) {
+        return null
+      }
+      return new Date(tokens[0], tokens[1] - 1, tokens[2])
+    }
   },
   created: function() {
     this._jsonData = null
     Plotly.d3.json('https://corona.lmao.ninja/v2/historical', this.parseData);
   },
-  mounted: function() {
-    // Plotly.d3.json('https://corona.lmao.ninja/v2/historical',
-    // this.parseData);
-  },
+  mounted: function() {},
   watch: {
+    // country selection
     selectedCountries: function(val, oldVal) {
-      this.updateProcessedData()
+      this.updateGraphData()
     },
     searchedCountry: function(val, oldVal) {
       if (!val) {
@@ -103,16 +114,82 @@ var app = new Vue({
         }
         this.searchedCountry = ''
       }
-    }
+    },
+    // data selection
+    sinceDate: function(val, oldVal) {
+      this.updateGraphData()
+    },
+    dataSelectType: function(val, oldVal) {
+      this.updateGraphData()
+    },
+    threshold: function(val, oldVal) {
+      this.updateGraphData()
+    },
+    thresholdStat: function(val, oldVal) {
+      this.updateGraphData()
+    },
   },
   methods: {
-    updateProcessedData: function() {
+    dateFromUsFormat: function(usDate) {
+      var tokens = usDate.split('/')
+      if (tokens.length != 3) {
+        return null
+      }
+      return new Date('20' + tokens[2], tokens[0] - 1, tokens[1])
+    },
+    findThresholdReachedDate: function(data, threshold) {
+      for (const day in data) {
+        if (data[day] >= this.threshold) {
+          return this.dateFromUsFormat(day);
+        }
+      }
+      return null;
+    },
+    selectDataSinceDate: function(data, since) {
+      var d = [];
+      for (day in data) {
+        var date = this.dateFromUsFormat(day)
+        if (date >= since) {
+          d.push({idx: d.length, date: date, val: data[day]})
+        }
+      }
+      return d;
+    },
+    updateGraphData: function() {
       var data = {cases: [], deaths: [], recovered: []};
       for (country_data of this._jsonData) {
         if (this.selectedCountries.includes(country_data['country'])) {
+          let startDate = null
+          let xSelector = null
+          if (this.dataSelectType == dsSinceDate) {
+            startDate = this.sinceDate;
+            xSelector = function(d) {
+              return d.date;
+            }
+          }
+          else if (this.dataSelectType == dsThresholdReached) {
+            startDate = this.findThresholdReachedDate(
+                country_data['timeline'][this.thresholdStat], this.threshold);
+            xSelector = function(d) {
+              return d.idx;
+            }
+          }
+          else {
+            console.log(
+                'Data select type "' + this.dataSelectType + '" not supported')
+          }
+          if (startDate == null || xSelector == null) {
+            continue
+          }
           for (stat of ['cases', 'deaths', 'recovered']) {
-            data[stat][country_data['country']] =
-                country_data['timeline'][stat];
+            const selectedData = this.selectDataSinceDate(
+                country_data['timeline'][stat], startDate)
+            const graphDataSince = selectedData.map(function(d) {
+              return {
+                x: xSelector(d), y: d.val
+              }
+            });
+            data[stat][country_data['country']] = graphDataSince
           }
         }
       }
@@ -123,7 +200,7 @@ var app = new Vue({
                            .map(entry => entry['country'])
                            .sort();
       this._jsonData = json;
-      this.updateProcessedData();
+      this.updateGraphData();
     }
   }
 })
