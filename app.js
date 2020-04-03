@@ -78,7 +78,7 @@ var app = new Vue({
       {value: 'recovered', text: 'Recovered'}
     ],
     threshold: 50,
-    since: '2020-22-1',
+    since: '',
     graphData: {cases: null, deaths: null, recovered: null}
   },
   computed: {
