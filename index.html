@@ -46,20 +46,20 @@
                     <b-container>
                         <b-row>
                             <b-col>
-                                <graph-inst threshold=50 stat="Confirmed cases" divid="graph-cases"
+                                <graph-inst stat="Confirmed cases" divid="graph-cases" v-bind:xaxis-title="xaxisTitle"
                                     v-bind:plot-data="graphData.cases"></graph-inst>
                             </b-col>
                         </b-row>
                         <b-row>
                             <b-col>
-                                <graph-inst threshold=5 stat="Deaths" divid="graph-deaths"
+                                <graph-inst stat="Deaths" divid="graph-deaths" v-bind:xaxis-title="xaxisTitle"
                                     v-bind:plot-data="graphData.deaths">
                                 </graph-inst>
                             </b-col>
                         </b-row>
                         <b-row>
                             <b-col>
-                                <graph-inst threshold=50 stat="Recovered" divid="graph-recovered"
+                                <graph-inst stat="Recovered" divid="graph-recovered" v-bind:xaxis-title="xaxisTitle"
                                     v-bind:plot-data="graphData.recovered"></graph-inst>
                             </b-col>
                         </b-row>

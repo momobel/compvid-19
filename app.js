@@ -2,21 +2,18 @@ Vue.component('graph-inst', {
   props: {
     divid: String,
     stat: String,
-    threshold: Number,
+    xaxisTitle: {type: String, default: ''},
     log: {type: Boolean, default: true},
     plotData: Object,
   },
   computed: {
     title: function() {
-      return this.stat + ' since ' + this.threshold + ' reached'
-    },
-    xaxisTitle: function() {
-      return 'Days since ' + this.threshold + ' ' + this.stat
+      return this.stat
     }
   },
   data: function() {
     return {
-      divid: null, stat: '', threshold: 0, log: true, plotData: null
+      divid: null, stat: '', xaxisTitle: '', log: true, plotData: null
     }
   },
   template: `<div>
@@ -66,7 +63,7 @@ var app = new Vue({
     countries: [],
     selectedCountries: [],
     searchedCountry: '',
-    dataSelectType: dsSinceDate,
+    dataSelectType: dsThresholdReached,
     dataSelectOptions: [
       {value: dsThresholdReached, text: 'From threshold reached'},
       {value: dsSinceDate, text: 'Since date'}
@@ -88,6 +85,18 @@ var app = new Vue({
         return null
       }
       return new Date(tokens[0], tokens[1] - 1, tokens[2])
+    },
+    xaxisTitle: function() {
+      if (this.dataSelectType == dsSinceDate) {
+        return 'date';
+      }
+      if (this.dataSelectType == dsThresholdReached) {
+        const currentStat = this.thresholdStat;
+        const thStat =
+            this.thresholdStatOptions.find(e => e.value == currentStat).text;
+        return 'days since ' + this.threshold + ' ' + thStat + ' reached';
+      }
+      return '';
     }
   },
   created: function() {
