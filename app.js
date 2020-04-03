@@ -130,30 +130,22 @@ var app = new Vue({
     },
   },
   methods: {
-    dateFromUsFormat: function(usDate) {
-      var tokens = usDate.split('/')
-      if (tokens.length != 3) {
-        return null
-      }
-      return new Date('20' + tokens[2], tokens[0] - 1, tokens[1])
-    },
     findThresholdReachedDate: function(data, threshold) {
-      for (const day in data) {
-        if (data[day] >= this.threshold) {
-          return this.dateFromUsFormat(day);
+      for (const d of data) {
+        if (d.val >= this.threshold) {
+          return d.date;
         }
       }
       return null;
     },
     selectDataSinceDate: function(data, since) {
-      var d = [];
-      for (day in data) {
-        var date = this.dateFromUsFormat(day)
-        if (date >= since) {
-          d.push({idx: d.length, date: date, val: data[day]})
+      let out = [];
+      for (const d of data) {
+        if (d.date >= since) {
+          out.push({idx: out.length, date: d.date, val: d.val})
         }
       }
-      return d;
+      return out;
     },
     updateGraphData: function() {
       var data = {cases: [], deaths: [], recovered: []};
@@ -197,14 +189,31 @@ var app = new Vue({
       }
       this.graphData = data;
     },
+    dateFromUsFormat: function(usDate) {
+      var tokens = usDate.split('/')
+      if (tokens.length != 3) {
+        return null
+      }
+      return new Date('20' + tokens[2], tokens[0] - 1, tokens[1])
+    },
     parseData: function(json) {
       let countries = [];
       let dataByCountry = new Map();
       for (const cinfo of json) {
         if (cinfo['province'] == null) {
+          let dataByStat = {};
+          for (const stat in cinfo['timeline']) {
+            const rawData = cinfo['timeline'][stat];
+            let d = [];
+            for (const usDate in rawData) {
+              d.push(
+                  {date: this.dateFromUsFormat(usDate), val: rawData[usDate]});
+            }
+            dataByStat[stat] = d;
+          }
           const country = cinfo['country'];
           countries.push(country);
-          dataByCountry.set(country, cinfo['timeline']);
+          dataByCountry.set(country, dataByStat);
         }
       }
       this.countries = countries.sort();
