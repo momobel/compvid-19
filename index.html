@@ -16,7 +16,7 @@
 
 <body>
     <div id="app">
-        <b-navbar variant="dark" type="dark">
+        <b-navbar id="navbar" variant="dark" type="dark">
             <b-navbar-brand>compvid-19</b-navbar-brand>
             <b-collapse is-nav>
                 <b-navbar-nav>
@@ -26,18 +26,17 @@
         </b-navbar>
         </b-navbar>
 
-        <b-container fluid>
+        <b-container id="content" fluid>
             <b-row cols=auto>
                 <b-col cols=2>
                     <div id="country-filter">
-                        <b-form-input placeholder="Search country..." autofocus list="country-list"
+                        <b-form-input id="country-search" placeholder="Search country..." autofocus list="country-list"
                             v-model="searchedCountry">
                         </b-form-input>
                         <b-form-datalist id="country-list" :options="countries">
                         </b-form-datalist>
-                        <b-form-group label="Countries">
-                            <b-form-checkbox-group id="country-select" v-model="selectedCountries" :options="countries"
-                                stacked>
+                        <b-form-group id="country-select" label="Countries">
+                            <b-form-checkbox-group v-model="selectedCountries" :options="countries" stacked>
                             </b-form-checkbox-group>
                         </b-form-group>
                     </div>
@@ -65,19 +64,32 @@
                         </b-row>
                     </b-container>
                 </b-col>
-                <b-col cols=2>
-                    <b-form-group label="Data selection" label-for="data-select"></b-form-group>
-                    <b-form-select id="data-select" v-model="dataSelectType" :options="dataSelectOptions">
-                    </b-form-select>
+                <b-col cols=2 id="data-filter">
+                    <b-row>
+                        <b-col>
+                            <b-form-group label="Data selection" label-for="data-select"></b-form-group>
+                            <b-form-select id="data-select" v-model="dataSelectType" :options="dataSelectOptions">
+                            </b-form-select>
+                        </b-col>
+                    </b-row>
 
                     <!-- Selection from threshold -->
-                    <div v-if="dataSelectType == 'thresholdReached'">
-                        <b-form-input type="number" v-model="threshold"></b-form-input>
-                        <b-form-select v-model="thresholdStat" :options="thresholdStatOptions"></b-form-select>
-                    </div>
+                    <b-row v-if="dataSelectType == 'thresholdReached'" no-gutters>
+                        <b-col class="mr-2 my-2">
+                            <b-form-input type="number" v-model="threshold"></b-form-input>
+                        </b-col>
+                        <b-col md="auto" class="my-2">
+                            <b-form-select v-model="thresholdStat" :options="thresholdStatOptions"></b-form-select>
+                        </b-col>
+                    </b-row>
 
                     <!-- Selection from data -->
-                    <b-form-input v-if="dataSelectType == 'sinceDate'" type='date' v-model="since"></b-form-input>
+                    <b-row v-if="dataSelectType == 'sinceDate'">
+                        <b-col class="my-2">
+                            <b-form-input type='date' v-model="since">
+                            </b-form-input>
+                        </b-col>
+                    </b-row>
                 </b-col>
             </b-row>
         </b-container>

@@ -1,0 +1,29 @@
+:root {
+    --navbar-height: 40px;
+    --top-margin: 5px;
+    --country-search-height: 40px;
+    --country-search-margin: 10px;
+}
+
+#navbar {
+    height: var(--navbar-height);
+}
+
+#content {
+    margin-top: var(--top-margin);
+}
+
+#country-search {
+    height: var(--country-search-height);
+    margin-top: var(--country-search-margin);
+    margin-bottom: var(--country-search-margin);
+}
+
+#country-select {
+    height: calc(100vh - var(--navbar-height) - var(--top-margin) - var(--country-search-height) - 2 * var(--country-search-margin));
+    overflow-y: scroll;
+}
+
+#data-filter {
+    margin-top: 10px;
+}
