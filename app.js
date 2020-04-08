@@ -76,7 +76,14 @@ var app = new Vue({
     ],
     threshold: 50,
     since: '',
-    graphData: {cases: null, deaths: null, recovered: null}
+    graphData: {
+      cases: null,
+      deaths: null,
+      recovered: null,
+      cases_diff: null,
+      deaths_diff: null,
+      recovered_diff: null
+    }
   },
   computed: {
     sinceDate: function() {
@@ -179,7 +186,14 @@ var app = new Vue({
       return {startDate: startDate, xSelector: xSelector};
     },
     buildGraphDataForCountry: function(country) {
-      let data = {cases: [], deaths: [], recovered: []};
+      let data = {
+        cases: [],
+        deaths: [],
+        recovered: [],
+        cases_diff: [],
+        deaths_diff: [],
+        recovered_diff: []
+      };
       const cdata = this._dataByCountry.get(country);
       if (cdata == undefined) {
         console.warn('Unknown country ' + country);
@@ -189,7 +203,9 @@ var app = new Vue({
       if (dataMask.startDate == null || dataMask.xSelector == null) {
         return null;
       }
-      for (stat of ['cases', 'deaths', 'recovered']) {
+      for (stat
+               of ['cases', 'deaths', 'recovered', 'cases_diff', 'deaths_diff',
+                   'recovered_diff']) {
         const selectedData =
             this.selectDataSinceDate(cdata[stat], dataMask.startDate);
         const graphDataSince = selectedData.map(function(d) {
@@ -200,7 +216,14 @@ var app = new Vue({
       return data;
     },
     rebuildGraphData: function() {
-      let data = {cases: {}, deaths: {}, recovered: {}};
+      let data = {
+        cases: {},
+        deaths: {},
+        recovered: {},
+        cases_diff: {},
+        deaths_diff: {},
+        recovered_diff: {}
+      };
       for (const country of this.selectedCountries) {
         const graphData = this.buildGraphDataForCountry(country);
         if (graphData == null) {
@@ -209,6 +232,9 @@ var app = new Vue({
         data.cases[country] = graphData.cases;
         data.deaths[country] = graphData.deaths;
         data.recovered[country] = graphData.recovered;
+        data.cases_diff[country] = graphData.cases_diff;
+        data.deaths_diff[country] = graphData.deaths_diff;
+        data.recovered_diff[country] = graphData.recovered_diff;
       }
       this.graphData = data;
     },
@@ -228,11 +254,18 @@ var app = new Vue({
           for (const stat in cinfo['timeline']) {
             const rawData = cinfo['timeline'][stat];
             let d = [];
+            let diff = [];
+            let prev = 0;
             for (const usDate in rawData) {
-              d.push(
-                  {date: this.dateFromUsFormat(usDate), val: rawData[usDate]});
+              const date = this.dateFromUsFormat(usDate);
+              const val = rawData[usDate];
+              const delta = val - prev;
+              prev = val;
+              d.push({date: date, val: val});
+              diff.push({date: date, val: delta});
             }
             dataByStat[stat] = d;
+            dataByStat[stat + '_diff'] = diff;
           }
           const country = cinfo['country'];
           countries.push(country);

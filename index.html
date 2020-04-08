@@ -48,6 +48,11 @@
                                 <graph-inst stat="Confirmed cases" divid="graph-cases" v-bind:xaxis-title="xaxisTitle"
                                     v-bind:plot-data="graphData.cases"></graph-inst>
                             </b-col>
+                            <b-col>
+                                <graph-inst stat="New confirmed cases per day" divid="graph-cases-diff"
+                                    v-bind:xaxis-title="xaxisTitle" v-bind:plot-data="graphData.cases_diff">
+                                </graph-inst>
+                            </b-col>
                         </b-row>
                         <b-row>
                             <b-col>
@@ -55,11 +60,21 @@
                                     v-bind:plot-data="graphData.deaths">
                                 </graph-inst>
                             </b-col>
+                            <b-col>
+                                <graph-inst stat="New deaths per day" divid="graph-deaths-diff"
+                                    v-bind:xaxis-title="xaxisTitle" v-bind:plot-data="graphData.deaths_diff">
+                                </graph-inst>
+                            </b-col>
                         </b-row>
                         <b-row>
                             <b-col>
                                 <graph-inst stat="Recovered" divid="graph-recovered" v-bind:xaxis-title="xaxisTitle"
                                     v-bind:plot-data="graphData.recovered"></graph-inst>
+                            </b-col>
+                            <b-col>
+                                <graph-inst stat="New recovered per day" divid="graph-recovered-diff"
+                                    v-bind:xaxis-title="xaxisTitle" v-bind:plot-data="graphData.recovered_diff">
+                                </graph-inst>
                             </b-col>
                         </b-row>
                     </b-container>
